@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-
-//Поля схемы карточки
+// Поля схемы карточки
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -19,7 +18,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
   },
   likes: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
     default: [],
   },
   createdAt: {
@@ -27,6 +26,5 @@ const cardSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
 
 module.exports = mongoose.model('card', cardSchema);

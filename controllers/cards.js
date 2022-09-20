@@ -1,12 +1,12 @@
-const Card = require('../models/card')
+const Card = require('../models/card');
 
+const {
+  ERROR_REQUEST,
+  ERROR_NOT_FOUND,
+  ERROR_SERVER,
+} = require('../errors/errors');
 
-const ERROR_REQUEST = 400;
-const ERROR_NOT_FOUND = 404;
-const ERROR_SERVER = 500;
-
-
-//создаёт карточку
+// создаёт карточку
 const createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
@@ -15,23 +15,23 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки' });
+        // eslint-disable-next-line no-else-return
       } else {
         return res.status(ERROR_SERVER).send({ message: 'Произошла неизвестная ошибка' });
       }
     });
 };
 
-
-//возвращает все карточки
+// возвращает все карточки
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => {res.status(ERROR_SERVER).send({ message: 'Произошла неизвестная ошибка' });
+    .catch(() => {
+      res.status(ERROR_SERVER).send({ message: 'Произошла неизвестная ошибка' });
     });
 };
 
-
-//удаления карточки
+// удаления карточки
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
@@ -44,14 +44,14 @@ const deleteCard = (req, res) => {
       }
       if (err.message === 'NotFound') {
         return res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
+        // eslint-disable-next-line no-else-return
       } else {
         return res.status(ERROR_SERVER).send({ message: 'Произошла неизвестная ошибка' });
       }
     });
 };
 
-
-//лайк карточки
+// лайк карточки
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
@@ -68,15 +68,17 @@ const likeCard = (req, res) => {
       }
       if (err.message === 'NotFound') {
         return res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+        // eslint-disable-next-line no-else-return
       } else {
         return res.status(ERROR_SERVER).send({ message: 'Произошла неизвестная ошибка' });
       }
     });
 };
 
-//дизлайк карточки
+// дизлайк карточки
 const dislikeCard = (req, res) => {
-  Card.findByIdAndUpdate ( req.params.cardId,
+  Card.findByIdAndUpdate(
+    req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
@@ -90,17 +92,17 @@ const dislikeCard = (req, res) => {
       }
       if (err.message === 'NotFound') {
         return res.status(ERROR_NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+        // eslint-disable-next-line no-else-return
       } else {
         return res.status(ERROR_SERVER).send({ message: 'Произошла неизвестная ошибка' });
       }
     });
 };
 
-
 module.exports = {
   createCard,
   getCards,
   deleteCard,
   likeCard,
-  dislikeCard
-}
+  dislikeCard,
+};
