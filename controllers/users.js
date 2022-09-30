@@ -7,7 +7,7 @@ const User = require('../models/user');
 const ErrorValidation = require('../errors/error-validation');
 const ErrorUnauthorization = require('../errors/error-unauthorization');
 const ErrorNotFound = require('../errors/error-not-found');
-const ErrorConflict = require('../errors/error-forbidden');
+const ErrorConflict = require('../errors/error-conflict');
 
 // создание пользователя
 const createUser = (req, res, next) => {
@@ -34,7 +34,7 @@ const createUser = (req, res, next) => {
       if (err.code === 11000) {
         return next(new ErrorConflict('Пользователь уже существует'));
       } else {
-        return next(err);
+        next(err);
       }
     });
 };
