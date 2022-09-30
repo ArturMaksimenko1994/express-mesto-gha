@@ -2,9 +2,14 @@ const express = require('express'); // подключение express
 const mongoose = require('mongoose'); // подключение mongoose
 const bodyParser = require('body-parser'); // подключение body-parser
 
+const { celebrate, Joi, errors } = require('celebrate');
+
 const userRouter = require('./routes/users'); // импортируем роутер users
 const cardRouter = require('./routes/cards'); // импортируем роутер cards
 
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const ErrorNotFound = require('./errors/error-not-found');
 // создаем сервер
 const app = express();
 
@@ -20,22 +25,42 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-// временное решение авторизации
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+  }),
+}), createUser);
+
+app.use('/users', auth, userRouter);
+
+app.use('/cards', auth, cardRouter);
+
+app.use(errors());
+
 app.use((req, res, next) => {
-  req.user = {
-    _id: '63238b6b95582b0c468680f5',
-  };
-  next();
+  next(new ErrorNotFound('Страница не найдена'));
 });
 
-app.use('/users', userRouter);
-
-app.use('/cards', cardRouter);
-
-app.use('*', (req, res) => {
-  res.status(404).send({
-    message: 'Страница не существует',
-  });
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
 });
 
 // порт приложение слушает
