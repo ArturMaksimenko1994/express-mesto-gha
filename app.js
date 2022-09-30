@@ -10,6 +10,7 @@ const cardRouter = require('./routes/cards'); // импортируем роут
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const ErrorNotFound = require('./errors/error-not-found');
+const { RegularExpressions } = require('./validator/regular-expressions');
 // создаем сервер
 const app = express();
 
@@ -38,7 +39,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().regex(RegularExpressions),
   }),
 }), createUser);
 

@@ -1,6 +1,6 @@
 const cardRoutes = require('express').Router(); // создали роутер
 const { celebrate, Joi } = require('celebrate');
-
+const { RegularExpressions } = require('../validator/regular-expressions');
 const {
   createCard,
   getCards,
@@ -12,7 +12,7 @@ const {
 cardRoutes.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required(),
+    link: Joi.string().required().regex(RegularExpressions),
   }),
 }), createCard);
 

@@ -1,5 +1,6 @@
 const userRouter = require('express').Router(); // создали роутер
 const { celebrate, Joi } = require('celebrate');
+const { RegularExpressions } = require('../validator/regular-expressions');
 const {
   createUser,
   getUsers,
@@ -28,7 +29,7 @@ userRouter.patch('/me', celebrate({
 
 userRouter.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required(),
+    avatar: Joi.string().required().regex(RegularExpressions),
   }),
 }), updateAvatar);
 
