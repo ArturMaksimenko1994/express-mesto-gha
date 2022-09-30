@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+const { RegularExpressions } = require('../validator/regular-expressions');
+
+function validateUrl(v) {
+  return RegularExpressions.test(v);
+}
+
 // Поля схемы карточки
 const cardSchema = new mongoose.Schema({
   name: {
@@ -11,6 +17,7 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: { validator: validateUrl },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
