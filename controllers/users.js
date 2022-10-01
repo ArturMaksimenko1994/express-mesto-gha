@@ -53,7 +53,11 @@ const login = (req, res, next) => {
           if (!matched) {
             return next(new ErrorUnauthorization('Неправильные почта или пароль'));
           }
-          return res.status(200).send({ token });
+          return res.status(200).res.cookie('jwt', token, {
+            maxAge: 3600000,
+            httpOnly: true,
+            sameSite: true, // добавили опцию
+          });
         })
         .catch(() => {
           next(new ErrorUnauthorization('Введите почту и пароль'));
