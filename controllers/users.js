@@ -9,44 +9,27 @@ const ErrorUnauthorization = require('../errors/error-unauthorization');
 const ErrorNotFound = require('../errors/error-not-found');
 const ErrorConflict = require('../errors/error-conflict');
 
-function addCookieToResponse(res, user) {
-  const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
-  res
-    .status(200)
-    .cookie('jwt', token, {
-      maxAge: 3600000,
-      httpOnly: true,
-      sameSite: true, // добавили опцию (запрос сделан с того же домена)
-    })
-    .end();// если у ответа нет тела, можно использовать метод end
-}
-
 // создание пользователя
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  bcrypt.hash(req.body.password, 10) // хешируем пароль
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     .then((user) => {
       res.send({
         _id: user._id,
+        email: user.email,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
-        email: user.email,
       });
     })
-    .then((user) => {
-      addCookieToResponse(res, user);
-      res.status(201).send(user);
-    })
     .catch((err) => {
-      res.clearCookie('jwt');
       if (err.name === 'ValidationError') {
-        return next(new ErrorValidation('Переданы некорректные данные при создании пользователя'));
+        return next(new ErrorValidation('Переданы некорректные данные'));
       }
       if (err.code === 11000) {
         return next(new ErrorConflict('Пользователь уже существует'));
@@ -57,18 +40,20 @@ const createUser = (req, res, next) => {
 };
 
 // контроллер аутентификации
-const login = (req, res, next) => {
+const login = (req, res, next) => { // аутентификация(вход на сайт) пользователя
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
-    .then((user) => {
-      addCookieToResponse(res, user);
-      res.status(200).send({ message: 'Вы успешно авторизованы' });
+    .then((user) => { // аутентификация успешна! пользователь в переменной user
+      // создадим токен
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+      // вернём токен
+      res.send({ token });
     })
-    .catch((err) => {
-      res.clearCookie('jwt');
-      next(err);
+    .catch(() => {
+      next(new ErrorUnauthorization('Неправильные логин или пароль'));
     });
 };
+
 // возвращает всех пользователей
 const getUsers = (req, res, next) => {
   User.find({})
