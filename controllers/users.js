@@ -14,22 +14,22 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  bcrypt.hash(req.body.password, 10)
+  bcrypt.hash(req.body.password, 10) // хешируем пароль
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     .then((user) => {
       res.send({
         _id: user._id,
-        email: user.email,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
+        email: user.email,
       });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new ErrorValidation('Переданы некорректные данные'));
+        return next(new ErrorValidation('Переданы некорректные данные при создании пользователя'));
       }
       if (err.code === 11000) {
         return next(new ErrorConflict('Пользователь уже существует'));
@@ -40,17 +40,25 @@ const createUser = (req, res, next) => {
 };
 
 // контроллер аутентификации
-const login = (req, res, next) => { // аутентификация(вход на сайт) пользователя
+const login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
-    .then((user) => { // аутентификация успешна! пользователь в переменной user
-      // создадим токен
-      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
-      // вернём токен
-      res.send({ token });
-    })
-    .catch(() => {
-      next(new ErrorUnauthorization('Неправильные логин или пароль'));
+  User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return next(new ErrorUnauthorization('Неправильные почта или пароль'));
+      }
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }); // токен будет просрочен через 7 дней
+      return bcrypt.compare(password, user.password) // сравниваем переданный пароль и хеш из базы
+        .then((matched) => {
+          if (!matched) {
+            return next(new ErrorUnauthorization('Неправильные почта или пароль'));
+          }
+          return res.status(200).send({ token });
+        })
+        .catch(() => {
+          next(new ErrorUnauthorization('Введите почту и пароль'));
+        })
+        .catch(next);
     });
 };
 
