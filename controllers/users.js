@@ -39,7 +39,7 @@ const createUser = (req, res, next) => {
     });
 };
 
-// контроллер аутентификации
+// аутентификация(вход на сайт) пользователя
 const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email }).select('+password')
@@ -47,17 +47,15 @@ const login = (req, res, next) => {
       if (!user) {
         return next(new ErrorUnauthorization('Неправильные почта или пароль'));
       }
+      // создадим токен
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }); // токен будет просрочен через 7 дней
       return bcrypt.compare(password, user.password) // сравниваем переданный пароль и хеш из базы
         .then((matched) => {
           if (!matched) {
             return next(new ErrorUnauthorization('Неправильные почта или пароль'));
           }
-          return res.status(200).res.cookie('jwt', token, {
-            maxAge: 3600000,
-            httpOnly: true,
-            sameSite: true, // добавили опцию
-          });
+          // вернём токен
+          res.status(200).send({ token });
         })
         .catch(() => {
           next(new ErrorUnauthorization('Введите почту и пароль'));
