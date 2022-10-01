@@ -9,6 +9,18 @@ const ErrorUnauthorization = require('../errors/error-unauthorization');
 const ErrorNotFound = require('../errors/error-not-found');
 const ErrorConflict = require('../errors/error-conflict');
 
+function addCookieToResponse(res, user) {
+  const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+  res
+    .status(200)
+    .cookie('jwt', token, {
+      maxAge: 3600000,
+      httpOnly: true,
+      sameSite: true, // добавили опцию (запрос сделан с того же домена)
+    })
+    .end();// если у ответа нет тела, можно использовать метод end
+}
+
 // создание пользователя
 const createUser = (req, res, next) => {
   const {
@@ -27,7 +39,12 @@ const createUser = (req, res, next) => {
         email: user.email,
       });
     })
+    .then((user) => {
+      addCookieToResponse(res, user);
+      res.status(201).send(user);
+    })
     .catch((err) => {
+      res.clearCookie('jwt');
       if (err.name === 'ValidationError') {
         return next(new ErrorValidation('Переданы некорректные данные при создании пользователя'));
       }
@@ -42,26 +59,16 @@ const createUser = (req, res, next) => {
 // контроллер аутентификации
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        return next(new ErrorUnauthorization('Неправильные почта или пароль'));
-      }
-      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }); // токен будет просрочен через 7 дней
-      return bcrypt.compare(password, user.password) // сравниваем переданный пароль и хеш из базы
-        .then((matched) => {
-          if (!matched) {
-            return next(new ErrorUnauthorization('Неправильные почта или пароль'));
-          }
-          return res.status(200).send({ token });
-        })
-        .catch(() => {
-          next(new ErrorUnauthorization('Введите почту и пароль'));
-        })
-        .catch(next);
+      addCookieToResponse(res, user);
+      res.status(200).send({ message: 'Вы успешно авторизованы' });
+    })
+    .catch((err) => {
+      res.clearCookie('jwt');
+      next(err);
     });
 };
-
 // возвращает всех пользователей
 const getUsers = (req, res, next) => {
   User.find({})
