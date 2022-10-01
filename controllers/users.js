@@ -74,7 +74,9 @@ const getUsers = (req, res, next) => {
 // возвращает пользователя по _id
 const getUserId = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new Error('ErrorValidation'))
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -146,7 +148,9 @@ const updateAvatar = (req, res, next) => {
 // информация о пользователе
 const getUserInfo = (req, res, next) => {
   User.findById({ _id: req.user._id })
-    .orFail(new Error('ErrorValidation'))
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
