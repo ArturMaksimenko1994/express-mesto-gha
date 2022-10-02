@@ -11,6 +11,8 @@ const {
 
 userRouter.get('/', getUsers);
 
+userRouter.get('/me', getUserInfo);
+
 userRouter.get('/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().hex().length(24),
@@ -29,7 +31,5 @@ userRouter.patch('/me/avatar', celebrate({
     avatar: Joi.string().required().regex(RegularExpressions),
   }),
 }), updateAvatar);
-
-userRouter.get('/me', getUserInfo);
 
 module.exports = userRouter;

@@ -19,9 +19,7 @@ const app = express();
 
 // слушаем 3000 порт
 const { PORT = 3000 } = process.env;
-
 app.use(bodyParser.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
 

@@ -80,10 +80,10 @@ const getUserId = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new ErrorValidation('Невалидный id'));
+        return next(new ErrorValidation('Невалидный id1'));
       }
       if (err.message === 'NotFound') {
-        return next(new ErrorNotFound('Пользователь не найден'));
+        return next(new ErrorNotFound('Пользователь2 не найден'));
       } else {
         next(err);
       }
@@ -156,7 +156,7 @@ const getUserInfo = (req, res, next) => {
         return next(new ErrorValidation('Невалидный id'));
       }
       if (err.message === 'NotFound') {
-        return next(new ErrorNotFound('Пользователь не найден'));
+        return next(new ErrorNotFound('Пользователь1 не найден'));
       } else {
         next(err);
       }
