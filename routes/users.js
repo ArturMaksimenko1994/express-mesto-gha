@@ -2,15 +2,12 @@ const userRouter = require('express').Router(); // создали роутер
 const { celebrate, Joi } = require('celebrate');
 const { RegularExpressions } = require('../validator/regular-expressions');
 const {
-  createUser,
   getUsers,
   getUserId,
   updateProfile,
   updateAvatar,
   getUserInfo,
 } = require('../controllers/users');
-
-userRouter.post('/', createUser);
 
 userRouter.get('/', getUsers);
 

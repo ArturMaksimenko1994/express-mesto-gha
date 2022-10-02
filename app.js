@@ -1,7 +1,7 @@
 const express = require('express'); // подключение express
 const mongoose = require('mongoose'); // подключение mongoose
 const bodyParser = require('body-parser'); // подключение body-parser
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
 
 const { celebrate, Joi, errors } = require('celebrate');
 
@@ -9,6 +9,7 @@ const userRouter = require('./routes/users'); // импортируем роут
 const cardRouter = require('./routes/cards'); // импортируем роутер cards
 
 const { createUser, login } = require('./controllers/users');
+
 const auth = require('./middlewares/auth');
 const ErrorNotFound = require('./errors/error-not-found');
 const { RegularExpressions } = require('./validator/regular-expressions');
@@ -22,7 +23,7 @@ const { PORT = 3000 } = process.env;
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
