@@ -55,7 +55,7 @@ const login = (req, res, next) => {
             return next(new ErrorUnauthorization('Неправильные почта или пароль'));
           }
           // вернём токен
-          res.send({ token });
+          return res.send({ token });
         })
         .catch(() => {
           next(new ErrorUnauthorization('Введите почту и пароль'));
