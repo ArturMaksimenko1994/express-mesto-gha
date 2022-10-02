@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const isEmail = require('validator/lib/isEmail');
-
+const validator = require('validator');
 const { RegularExpressions } = require('../validator/regular-expressions');
 
 function validateUrl(v) {
@@ -11,15 +10,15 @@ function validateUrl(v) {
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    default: 'Жак-Ив Кусто',
     minlength: 2,
     maxlength: 30,
-    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
+    default: 'Исследователь',
     minlength: 2,
     maxlength: 30,
-    default: 'Исследователь',
   },
   avatar: {
     type: String,
@@ -28,19 +27,15 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique: true, // оно должно быть у каждого пользователя, и уникальным
     required: true,
-    validate: {
-      validator: (v) => isEmail(v),
-      message: 'Неправильный формат почты',
-    },
+    unique: true,
+    validate: [validator.isEmail, 'invalid email'],
   },
   password: {
     type: String,
     required: true,
-    select: false, // не возвращает хеш пароля
+    select: false,
   },
-
 });
 
 module.exports = mongoose.model('user', userSchema);
