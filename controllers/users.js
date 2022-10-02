@@ -47,7 +47,7 @@ const login = (req, res, next) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
       // вернём токен
-      res.send({ token });
+      return res.status(200).send({ token });
     })
     .catch(() => {
       next(new ErrorUnauthorization('Неправильные логин или пароль'));
