@@ -55,7 +55,7 @@ const login = (req, res, next) => {
             return next(new ErrorUnauthorization('Неправильные почта или пароль'));
           }
           // вернём токен
-          return res.status(200).cookie('jwt', token, { maxAge: 604800000, httpOnly: true, sameSite: true });
+          res.send({ token });
         })
         .catch(() => {
           next(new ErrorUnauthorization('Введите почту и пароль'));
