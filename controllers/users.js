@@ -156,7 +156,7 @@ const getUserInfo = (req, res, next) => {
         return next(new ErrorValidation('Невалидный id'));
       }
       if (err.message === 'NotFound') {
-        return next(new ErrorNotFound('Пользователь с указанным _id не найден'));
+        return next(new ErrorNotFound('Пользователь не найден'));
       } else {
         next(err);
       }
