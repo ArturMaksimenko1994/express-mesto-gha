@@ -47,12 +47,7 @@ const login = (req, res, next) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
       // вернём токен
-      res.cookie('jwt', token, {
-        maxAge: 3600000,
-        httpOnly: true,
-        sameSite: true, // добавили опцию
-      })
-        .end();
+      res.send({ token });
     })
     .catch(() => {
       next(new ErrorUnauthorization('Неправильные логин или пароль'));
