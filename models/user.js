@@ -6,6 +6,8 @@ function validateUrl(v) {
   return RegularExpressions.test(v);
 }
 
+validator.isEmail('foo@bar.com');
+
 // Поля схемы пользователя
 const userSchema = new mongoose.Schema({
   name: {
