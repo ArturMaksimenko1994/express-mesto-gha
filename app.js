@@ -20,6 +20,7 @@ const app = express();
 const { PORT = 3000 } = process.env;
 
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
   next(new ErrorNotFound('Страница не найдена'));
 });
 
+// обрабатываем все ошибки
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode)
