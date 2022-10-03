@@ -1,6 +1,7 @@
 const userRouter = require('express').Router(); // создали роутер
 const { celebrate, Joi } = require('celebrate');
 const { RegularExpressions } = require('../validator/regular-expressions');
+const auth = require('../middlewares/auth');
 const {
   getUsers,
   getUserId,
@@ -28,24 +29,24 @@ userRouter.post('/signup', celebrate({
   }),
 }), createUser);
 
-userRouter.get('/', getUsers);
+userRouter.get('/', auth, getUsers);
 
 userRouter.get('/me', getUserInfo);
 
-userRouter.get('/:userId', celebrate({
+userRouter.get('/:userId', auth, celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().hex().length(24),
   }),
 }), getUserId);
 
-userRouter.patch('/me', celebrate({
+userRouter.patch('/me', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
 }), updateProfile);
 
-userRouter.patch('/me/avatar', celebrate({
+userRouter.patch('/me/avatar', auth, celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().regex(RegularExpressions),
   }),

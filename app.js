@@ -29,7 +29,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.use('/users', auth, userRouter);
+app.use('/users', userRouter);
 
 app.use('/cards', auth, cardRouter);
 
