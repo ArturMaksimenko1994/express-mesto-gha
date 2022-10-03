@@ -36,12 +36,12 @@ const deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (card.owner.toString() === req.user._id.toString()) {
-        card.remove();
-        return res.status(200).send({ data: card });
+        return card.remove();
       } else {
         return next(new ErrorForbidden('Вы не можете удалить эту карточку'));
       }
     })
+    .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new ErrorForbidden('Невалидный id'));

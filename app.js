@@ -1,17 +1,22 @@
 const express = require('express'); // подключение express
 const mongoose = require('mongoose'); // подключение mongoose
 const bodyParser = require('body-parser'); // подключение body-parser
-// const cookieParser = require('cookie-parser');
 
-const { celebrate, Joi, errors } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate'); // подключение celebrate
 
+// routes
 const userRouter = require('./routes/users'); // импортируем роутер users
 const cardRouter = require('./routes/cards'); // импортируем роутер cards
 
 const { createUser, login } = require('./controllers/users');
 
+// middlewares
 const auth = require('./middlewares/auth');
+const ErrorHandler = require('./middlewares/error-handler');
+
+// errors
 const ErrorNotFound = require('./errors/error-not-found');
+
 const { RegularExpressions } = require('./validator/regular-expressions');
 
 // создаем сервер
@@ -21,7 +26,6 @@ const app = express();
 const { PORT = 3000 } = process.env;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(cookieParser());
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -57,16 +61,7 @@ app.use((req, res, next) => {
 });
 
 // обрабатываем все ошибки
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-  next();
-});
+app.use(ErrorHandler, auth);
 
 // порт приложение слушает
 app.listen(PORT, () => {
