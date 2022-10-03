@@ -61,6 +61,9 @@ const login = (req, res, next) => {
           next(new ErrorUnauthorization('Введите почту и пароль'));
         })
         .catch(next);
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
