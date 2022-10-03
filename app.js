@@ -61,7 +61,7 @@ app.use(auth, ((req, res, next) => {
 }));
 
 // обрабатываем все ошибки
-app.use(ErrorHandler, auth);
+app.use(ErrorHandler);
 
 // порт приложение слушает
 app.listen(PORT, () => {
