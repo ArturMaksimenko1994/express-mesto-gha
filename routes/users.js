@@ -7,6 +7,8 @@ const {
   updateProfile,
   updateAvatar,
   getUserInfo,
+  login,
+  createUser,
 } = require('../controllers/users');
 
 userRouter.get('/', getUsers);
@@ -31,5 +33,22 @@ userRouter.patch('/me/avatar', celebrate({
     avatar: Joi.string().required().regex(RegularExpressions),
   }),
 }), updateAvatar);
+
+userRouter.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+userRouter.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(RegularExpressions),
+  }),
+}), createUser);
 
 module.exports = userRouter;

@@ -2,13 +2,11 @@ const express = require('express'); // подключение express
 const mongoose = require('mongoose'); // подключение mongoose
 const bodyParser = require('body-parser'); // подключение body-parser
 
-const { celebrate, Joi, errors } = require('celebrate'); // подключение celebrate
+const { errors } = require('celebrate'); // подключение celebrate
 
 // routes
 const userRouter = require('./routes/users'); // импортируем роутер users
 const cardRouter = require('./routes/cards'); // импортируем роутер cards
-
-const { createUser, login } = require('./controllers/users');
 
 // middlewares
 const auth = require('./middlewares/auth');
@@ -16,8 +14,6 @@ const ErrorHandler = require('./middlewares/error-handler');
 
 // errors
 const ErrorNotFound = require('./errors/error-not-found');
-
-const { RegularExpressions } = require('./validator/regular-expressions');
 
 // создаем сервер
 const app = express();
@@ -32,23 +28,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(RegularExpressions),
-  }),
-}), createUser);
 
 app.use('/users', auth, userRouter);
 
