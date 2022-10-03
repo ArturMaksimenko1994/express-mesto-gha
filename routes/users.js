@@ -30,24 +30,24 @@ userRouter.post('/signup', celebrate({
   }),
 }), createUser);
 
-userRouter.get('/', auth, getUsers);
+userRouter.get('users/', auth, getUsers);
 
-userRouter.get('/me', auth, getUserInfo);
+userRouter.get('users/me', auth, getUserInfo);
 
-userRouter.get('/:userId', auth, celebrate({
+userRouter.get('users/:userId', auth, celebrate({
   params: Joi.object().keys({
     userId: Joi.string().alphanum().hex().length(24),
   }),
 }), getUserId);
 
-userRouter.patch('/me', auth, celebrate({
+userRouter.patch('users/me', auth, celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
 }), updateProfile);
 
-userRouter.patch('/me/avatar', auth, celebrate({
+userRouter.patch('users/me/avatar', auth, celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().regex(RegularExpressions),
   }),
