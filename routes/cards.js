@@ -2,6 +2,7 @@ const cardRoutes = require('express').Router(); // создали роутер
 const { celebrate, Joi } = require('celebrate');
 const { RegularExpressions } = require('../validator/regular-expressions');
 const auth = require('../middlewares/auth');
+
 const {
   createCard,
   getCards,
