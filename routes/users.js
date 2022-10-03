@@ -2,6 +2,7 @@ const userRouter = require('express').Router(); // создали роутер
 const { celebrate, Joi } = require('celebrate');
 const { RegularExpressions } = require('../validator/regular-expressions');
 const auth = require('../middlewares/auth');
+
 const {
   getUsers,
   getUserId,
@@ -31,7 +32,7 @@ userRouter.post('/signup', celebrate({
 
 userRouter.get('/', auth, getUsers);
 
-userRouter.get('/me', getUserInfo);
+userRouter.get('/me', auth, getUserInfo);
 
 userRouter.get('/:userId', auth, celebrate({
   params: Joi.object().keys({
